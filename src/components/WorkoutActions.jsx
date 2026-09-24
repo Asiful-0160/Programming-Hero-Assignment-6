@@ -4,10 +4,10 @@ import { Bookmark, Check, Plus } from 'lucide-react'
 import { useWorkoutPlan } from '@/context/WorkoutPlanContext'
 
 export default function WorkoutActions({ workout }) {
-  const { plan, saved, ready, addToPlan, saveWorkout } = useWorkoutPlan()
+  const { plan, saved, ready, pendingCount, addToPlan, saveWorkout } = useWorkoutPlan()
   const inPlan = plan.includes(workout.id)
   const isSaved = saved.includes(workout.id)
-  const planFull = plan.length >= 5
+  const planFull = pendingCount >= 5
 
   return (
     <div className="workout-actions">

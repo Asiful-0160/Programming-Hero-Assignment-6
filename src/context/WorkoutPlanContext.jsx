@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 
 const WorkoutPlanContext = createContext(null)
 const STORAGE_KEY = 'fitlog-plan'
-const initialState = { plan: [], saved: [], ready: false }
+const initialState = { plan: [], saved: [], completed: [], ready: false }
 
 function validIds(value) {
   return Array.isArray(value)
@@ -15,18 +15,35 @@ function validIds(value) {
 
 function planReducer(state, action) {
   switch (action.type) {
-    case 'restore':
+    case 'restore': {
+      const completed = validIds(action.value?.completed)
+      const restoredPlan = validIds(action.value?.plan)
+      const pending = restoredPlan.filter((id) => !completed.includes(id)).slice(0, 5)
+      const plan = restoredPlan.filter((id) => completed.includes(id) || pending.includes(id))
       return {
-        plan: validIds(action.value?.plan).slice(0, 5),
+        plan,
+        completed: completed.filter((id) => plan.includes(id)),
         saved: validIds(action.value?.saved),
         ready: true,
       }
+    }
     case 'add-plan':
-      if (state.plan.includes(action.id) || state.plan.length >= 5) return state
+      if (state.plan.includes(action.id) || state.plan.filter((id) => !state.completed.includes(id)).length >= 5) return state
       return { ...state, plan: [...state.plan, action.id] }
     case 'save':
       if (state.saved.includes(action.id)) return state
       return { ...state, saved: [...state.saved, action.id] }
+    case 'complete':
+      if (!state.plan.includes(action.id) || state.completed.includes(action.id)) return state
+      return { ...state, completed: [...state.completed, action.id] }
+    case 'remove-plan':
+      return {
+        ...state,
+        plan: state.plan.filter((id) => id !== action.id),
+        completed: state.completed.filter((id) => id !== action.id),
+      }
+    case 'remove-saved':
+      return { ...state, saved: state.saved.filter((id) => id !== action.id) }
     default:
       return state
   }
@@ -34,6 +51,7 @@ function planReducer(state, action) {
 
 export function WorkoutPlanProvider({ children }) {
   const [state, dispatch] = useReducer(planReducer, initialState)
+  const pendingCount = state.plan.filter((id) => !state.completed.includes(id)).length
 
   useEffect(() => {
     try {
@@ -48,7 +66,7 @@ export function WorkoutPlanProvider({ children }) {
     if (!state.ready) return
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ plan: state.plan, saved: state.saved }))
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ plan: state.plan, saved: state.saved, completed: state.completed }))
     } catch {
       toast.warn('Your changes work for this visit, but could not be saved on this browser.', { toastId: 'storage-error' })
     }
@@ -56,8 +74,8 @@ export function WorkoutPlanProvider({ children }) {
 
   function addToPlan(workout) {
     if (!state.ready || state.plan.includes(workout.id)) return
-    if (state.plan.length >= 5) {
-      toast.info('Your plan already contains five workouts.')
+    if (pendingCount >= 5) {
+      toast.info('Finish or remove a workout before adding another.')
       return
     }
     dispatch({ type: 'add-plan', id: workout.id })
@@ -70,8 +88,20 @@ export function WorkoutPlanProvider({ children }) {
     toast.success(`${workout.name} saved for later.`)
   }
 
+  function completeWorkout(workout) {
+    if (!state.plan.includes(workout.id) || state.completed.includes(workout.id)) return
+    dispatch({ type: 'complete', id: workout.id })
+    toast.success(`${workout.name} marked as done.`)
+  }
+
+  function removeWorkout(workout, list) {
+    if (!['plan', 'saved'].includes(list) || !state[list].includes(workout.id)) return
+    dispatch({ type: `remove-${list}`, id: workout.id })
+    toast.info(`${workout.name} removed from ${list === 'plan' ? "today's plan" : 'saved workouts'}.`)
+  }
+
   return (
-    <WorkoutPlanContext.Provider value={{ ...state, addToPlan, saveWorkout }}>
+    <WorkoutPlanContext.Provider value={{ ...state, pendingCount, addToPlan, saveWorkout, completeWorkout, removeWorkout }}>
       {children}
     </WorkoutPlanContext.Provider>
   )
