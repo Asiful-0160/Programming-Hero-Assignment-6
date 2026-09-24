@@ -1,11 +1,13 @@
-import { Dumbbell } from 'lucide-react'
+import Hero from '@/components/Hero'
 
 export default function HomePage() {
   return (
-    <main id="main-content" className="page-container page-content flex flex-col justify-center gap-5" tabIndex={-1}>
-      <Dumbbell className="text-[#ccff00]" size={40} aria-hidden="true" />
-      <h1 className="text-5xl font-bold">FITLOG</h1>
-      <p className="text-lg text-neutral-300">Train with intent. Log every set.</p>
+    <main id="main-content" className="home-content" tabIndex={-1}>
+      <Hero />
+      <section id="library" className="page-container library-section" aria-labelledby="library-title" tabIndex={-1}>
+        <h2 id="library-title">THE LIBRARY</h2>
+        <p>Twelve lifts covering every major muscle group.</p>
+      </section>
     </main>
   )
 }

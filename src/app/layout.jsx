@@ -1,4 +1,8 @@
 import './globals.css'
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/700.css'
+import '@fontsource/oswald/700.css'
 import 'react-toastify/dist/ReactToastify.css'
 import Providers from './providers'
 import Navbar from '@/components/Navbar'
