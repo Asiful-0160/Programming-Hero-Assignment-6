@@ -5,7 +5,7 @@
 FitLog is a responsive workout library and daily training planner. Explore
 12 exercises, review their instructions, build a plan, and track completed lifts.
 
-- **Live site:** Pending deployment.
+- **Live site:** [FitLog](https://programming-hero-assignment-6.vercel.app)
 - **Repository:** [Programming-Hero-Assignment-6](https://github.com/Asiful-0160/Programming-Hero-Assignment-6)
 
 ## Features
@@ -108,5 +108,5 @@ Deploy using a hosting service that supports the Next.js server runtime.
 Workout detail pages fetch data on the server, so this is not a static HTML export.
 Use Node.js 24, install with `npm ci`, and build with `npm run build`.
 
-After deployment, replace the pending live link above and verify direct visits
-and reloads on `/`, `/my-plan`, and `/workouts/1`, plus an unknown route.
+The live site is deployed on Vercel. After future deployments, verify direct
+visits and reloads on `/`, `/my-plan`, and `/workouts/1`, plus an unknown route.
