@@ -3,8 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Brand from './Brand'
+import { useWorkoutPlan } from '@/context/WorkoutPlanContext'
 
-export default function Navbar({ planCount = 0, savedCount = 0 }) {
+export default function Navbar() {
+  const { plan, saved } = useWorkoutPlan()
+  const planCount = plan.length
+  const savedCount = saved.length
   const pathname = usePathname()
   const isWorkoutPage = pathname === '/' || pathname.startsWith('/workouts/')
 
